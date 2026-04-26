@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мир профессий - Профориентация</title>
+    <style>
+        /* Базовые стили */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            /* Абстрактный фон в стиле рисунка на главной странице */
+            background-image: radial-gradient(circle at 10% 20%, rgba(0, 50, 255, 0.05) 0%, transparent 20%),
+                              radial-gradient(circle at 90% 80%, rgba(0, 50, 255, 0.05) 0%, transparent 20%);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Управление страницами */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Кнопки и навигация */
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            background-color: #ffffff;
+            border: 2px solid #0056b3;
+            color: #0056b3;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .nav-btn:hover {
+            background-color: #0056b3;
+            color: #ffffff;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            text-decoration: underline;
+        }
+
+        /* Стили для теста (опроса) */
+        .quiz-question {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f1f3f5;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: left;
+        }
+        .quiz-option:hover {
+            background-color: #e2e6ea;
+        }
+
+        /* Стили для результатов теста */
+        .result-title {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            color: #0056b3;
+            margin-top: 50px;
+        }
+        .result-desc {
+            font-size: 18px;
+            line-height: 1.6;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Стили для списков (профессии, вузы, советы) */
+        .list-item {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .item-image {
+            width: 100%;
+            height: 250px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+            font-size: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden; /* Чтобы картинка не вылезала за скругленные углы */
+        }
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .item-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .item-desc {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #444;
+        }
+        .highlight-tags {
+            color: #0056b3;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div id="home" class="page active">
+        <h1 style="text-align: center; color: #333; margin-top: 40px; margin-bottom: 40px;">Выбор пути</h1>
+        <button class="nav-btn" onclick="startQuiz()">Опрос: кто ты в мире профессий?</button>
+        <button class="nav-btn" onclick="showPage('professions')">ТОП-10 востребованных профессий в ближайшие 10 лет</button>
+        <button class="nav-btn" onclick="showPage('universities')">ТОП-15 университетов России</button>
+        <button class="nav-btn" onclick="showPage('advice')">Что учитывать при выборе профессии?</button>
+    </div>
+
+    <div id="quiz" class="page">
+        <button class="back-btn" onclick="showPage('home')">← Назад на главную</button>
+        <div id="quiz-container">
+            <div class="quiz-question" id="question-text">Загрузка вопроса...</div>
+            <div id="options-container"></div>
+        </div>
+    </div>
+
+    <div id="result" class="page">
+        <button class="back-btn" onclick="showPage('home')">← На главную страницу</button>
+        <div class="result-title" id="result-title">Твоя профессия: ...</div>
+        <div class="result-desc" id="result-desc">Описание результата...</div>
+        <button class="nav-btn" style="margin-top: 40px;" onclick="startQuiz()">Пройти опрос заново</button>
+    </div>
+
+    <div id="professions" class="page">
+        <button class="back-btn" onclick="showPage('home')">← Назад на главную</button>
+        <h1 style="text-align: center;">ТОП-10 востребованных профессий</h1>
+        
+        <div class="list-item">
+            <div class="item-image"><img src="AI инженер.jpg" alt="AI-инженер"></div>
+            <div class="item-title">1. AI-инженер</div>
+            <div class="item-desc">Специалист, который обучает нейросети, создает алгоритмы машинного обучения и развивает искусственный интеллект. Эта профессия находится на пике популярности.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="специалист по кибербезопасности.jpg" alt="Кибербезопасность"></div>
+            <div class="item-title">2. Специалист по кибербезопасности</div>
+            <div class="item-desc">Защищает данные компаний и обычных пользователей от хакерских атак. С развитием интернета спрос на таких специалистов только растет.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="боинж.jpg" alt="Биоинформатик"></div>
+            <div class="item-title">3. Биоинформатик</div>
+            <div class="item-desc">Специалист на стыке биологии и IT. Занимается анализом данных для создания новых лекарств и изучения генетики.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="коуч.jpg" alt="Клинический психолог"></div>
+            <div class="item-title">4. Клинический психолог (и нейрокоуч)</div>
+            <div class="item-desc">Помогает людям адаптироваться к быстрому темпу жизни, лечит расстройства и помогает развивать способности мозга.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Логопед-дефектолог.jpg" alt="Логопед-дефектолог"></div>
+            <div class="item-title">5. Логопед-дефектолог (Нейрологопед)</div>
+            <div class="item-desc">Помогает детям и взрослым преодолеть нарушения речи, письма и глотания. Работает не только со звуками, но и с развитием зон мозга, ответственных за коммуникацию.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Data Scientist.jpg" alt="Data Scientist"></div>
+            <div class="item-title">6. Data Scientist (Архитектор данных)</div>
+            <div class="item-desc">Извлекает скрытые смыслы из огромных массивов информации, чтобы предсказывать тренды и поведение клиентов.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Тьютор.jpg" alt="Тьютор"></div>
+            <div class="item-title">7. Разработчик образовательных траекторий (Тьютор)</div>
+            <div class="item-desc">Личный наставник, который помогает составить план обучения на годы вперед. Он подбирает курсы, книги и практики под конкретные цели человека, учитывая его таланты.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Цифровой лингвист.jpg" alt="Цифровой лингвист"></div>
+            <div class="item-title">8. Цифровой лингвист</div>
+            <div class="item-desc">Именно эти люди учат нейросети понимать человеческий язык, нюансы иронии, сленг и эмоции. Они работают на стыке филологии и IT.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Эко-аналитик.jpg" alt="Эко-аналитик"></div>
+            <div class="item-title">9. Эко-аналитик</div>
+            <div class="item-desc">Переводит компании на «зеленые» рельсы: минимизирует вред экологии и внедряет циклическую экономику (переработку).</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="Медиатор социальных конфликтов.jpg" alt="Медиатор"></div>
+            <div class="item-title">10. Медиатор социальных конфликтов</div>
+            <div class="item-desc">Специалист, который помогает решать споры между разными группами людей (например, жителями района и застройщиками или внутри крупных корпораций) без суда.</div>
+        </div>
+        
+    </div>
+
+    <div id="universities" class="page">
+        <button class="back-btn" onclick="showPage('home')">← Назад на главную</button>
+        <h1 style="text-align: center;">ТОП-15 университетов России</h1>
+        
+        <div class="list-item">
+            <div class="item-image"><img src="1.jpg" alt="МГУ"></div>
+            <div class="item-title">1. МГУ им. М.В. Ломоносова (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Фундаментальные науки, Психология, Медицина</span>Главный вуз страны. Предлагает фундаментальное образование по огромному количеству направлений: от мехмата до журналистики.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="2.jpg" alt="НИУ ВШЭ"></div>
+            <div class="item-title">2. НИУ ВШЭ (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Экономика, Психология, Дизайн, ИТ</span>Один из самых современных вузов России. Славится сильными программами по экономике, IT, дизайну и социальным наукам.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="3.jpg" alt="МФТИ"></div>
+            <div class="item-title">3. МФТИ (Долгопрудный)</div>
+            <div class="item-desc"><span class="highlight-tags">Физика, Математика, ИТ-технологии</span>Лучший выбор для тех, кто хочет связать свою жизнь с физикой, математикой и передовыми IT-разработками.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="4.jpg" alt="СПбГУ"></div>
+            <div class="item-title">4. СПбГУ (Санкт-Петербург)</div>
+            <div class="item-desc"><span class="highlight-tags">Юриспруденция, Психология, Филология</span>Петербургская школа психологии считается классической и одной из самых глубоких в России. Идеально, если тебе интересна научная деятельность, исследования мозга и поведения.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="5.jpg" alt="МГТУ им. Баумана"></div>
+            <div class="item-title">5. МГТУ им. Н.Э. Баумана (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Инженерия, Робототехника</span>«Школа инженеров». Здесь учат проектировать всё: от роботов до ракет. Очень сильная практическая подготовка и дисциплина.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="6.jpg" alt="НИЯУ МИФИ"></div>
+            <div class="item-title">6. НИЯУ МИФИ (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Ядерная физика, Кибербезопасность</span>Ядерные технологии и физика высоких энергий. Вуз тесно связан с «Росатомом». Также здесь одна из сильнейших школ информационной безопасности в стране.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="7.jpg" alt="МГИМО"></div>
+            <div class="item-title">7. МГИМО МИД России (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Международные отношения, Право</span>Главный вуз для будущих дипломатов. Упор на иностранные языки (более 50 языков на выбор) и международные отношения. Очень сильное сообщество выпускников.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="8.jpg" alt="Университет ИТМО"></div>
+            <div class="item-title">8. Университет ИТМО (Санкт-Петербург)</div>
+            <div class="item-desc"><span class="highlight-tags">Программирование, Искусственный интеллект</span>"Первый неклассический". Лидер в программировании (многократные чемпионы мира) и робототехнике. Вуз с атмосферой ИТ-стартапа.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="9.jpg" alt="РАНХиГС"></div>
+            <div class="item-title">9. РАНХиГС (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Управление, Государственная служба</span>Кузница управленческих кадров. Если цель — государственное управление, крупный менеджмент или психология лидерства, то это лучший выбор.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="10.jpg" alt="УрФУ"></div>
+            <div class="item-title">10. УрФУ им. Б.Н. Ельцина (Екатеринбург)</div>
+            <div class="item-desc"><span class="highlight-tags">Психология, Технические науки, Гуманитарные</span>Огромный образовательный хаб прямо у тебя под боком. Плюс в том, что здесь сильное ИТ-сообщество и хорошие программы по психологии. Отличный вариант, если хочешь совмещать учебу с участием в крупных региональных проектах.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="11.jpg" alt="РУДН"></div>
+            <div class="item-title">11. РУДН (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Медицина, Лингвистика, Экология</span>Самый многонациональный. Известен своей медицинской школой и обучением иностранным языкам. Дает возможность завести контакты по всему миру.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="12.jpg" alt="МГМУ им. Сеченова"></div>
+            <div class="item-title">12. Первый МГМУ им. И.М. Сеченова (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Медицина, Клиническая психология</span>Флагман медицинского образования. Лучшее оборудование для будущих врачей и клинических психологов. Огромный упор на биомедицинские технологии.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="13.jpg" alt="ТГУ"></div>
+            <div class="item-title">13. ТГУ (Томск)</div>
+            <div class="item-desc"><span class="highlight-tags">Биология, Психология, Исследовательская работа</span>Один из лучших исследовательских центров в Сибири. Сильные факультеты биологии, психологии и филологии. Очень ценится в научной среде.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="14.jpg" alt="НИТУ МИСИС"></div>
+            <div class="item-title">14. НИТУ МИСИС (Москва)</div>
+            <div class="item-desc"><span class="highlight-tags">Материаловедение, Нанотехнологии</span>Лидер в науке о материалах и металлургии. Сейчас активно развивает направления ИТ, квантовых технологий и промышленного дизайна.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-image"><img src="15.jpg" alt="КФУ"></div>
+            <div class="item-title">15. КФУ (Казань)</div>
+            <div class="item-desc"><span class="highlight-tags">Педагогика, Психология, Биомедицина</span>Огромный университет с сильной базой в педагогике и биомедицине. Входит в число ведущих исследовательских центров страны с очень красивым кампусом.</div>
+        </div>
+
+        <p style="text-align: center; color: #888; font-style: italic;">*конец списка*</p>
+    </div>
+
+    <div id="advice" class="page">
+        <button class="back-btn" onclick="showPage('home')">← Назад на главную</button>
+        <h1 style="text-align: center;">Что учитывать при выборе профессии?</h1>
+        
+        <div class="list-item">
+            <div class="item-title" style="font-size: 26px;">Учитывать свои возможности</div>
+            <div class="item-desc">Важно трезво оценивать свои сильные и слабые стороны. Если ты гуманитарий, возможно, не стоит мучить себя продвинутой физикой, лучше развиваться в том, что дается легко и с удовольствием.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-title" style="font-size: 26px;">Изучать рынок труда</div>
+            <div class="item-desc">Посмотри, какие профессии сейчас востребованы и за что готовы платить компании. Выбирай сферу, которая не исчезнет через 5-10 лет из-за автоматизации.</div>
+        </div>
+
+        <div class="list-item">
+            <div class="item-title" style="font-size: 26px;">Пробовать на практике</div>
+            <div class="item-desc">Теория — это хорошо, но лучше всего сходить на день открытых дверей, посмотреть бесплатные вводные курсы или пообщаться со специалистами из выбранной сферы.</div>
+        </div>
+
+        <h1 style="text-align: center; font-size: 40px; margin-top: 50px;">И Т.Д. ↓</h1>
+    </div>
+
+</div>
+
+<script>
+    // --- ЛОГИКА НАВИГАЦИИ ПО СТРАНИЦАМ ---
+    function showPage(pageId) {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => page.classList.remove('active'));
+        
+        document.getElementById(pageId).classList.add('active');
+        window.scrollTo(0, 0); 
+    }
+
+    // --- ЛОГИКА ОПРОСА ---
+    const questions = [
+        {
+            text: "Что тебе нравится делать больше всего?",
+            options: [
+                { text: "Помогать людям и общаться", type: "social" },
+                { text: "Решать сложные логические задачки", type: "it" },
+                { text: "Рисовать, писать тексты, придумывать", type: "creative" },
+                { text: "Работать руками, конструировать", type: "practical" }
+            ]
+        },
+        {
+            text: "Какой твой любимый школьный предмет?",
+            options: [
+                { text: "Литература или История", type: "creative" },
+                { text: "Математика или Информатика", type: "it" },
+                { text: "Обществознание или Биология", type: "social" },
+                { text: "Физика или Труд", type: "practical" }
+            ]
+        },
+        {
+            text: "Как ты предпочитаешь работать?",
+            options: [
+                { text: "В тишине за компьютером", type: "it" },
+                { text: "В команде, постоянно обсуждая идеи", type: "social" },
+                { text: "В творческом беспорядке", type: "creative" },
+                { text: "В мастерской или лаборатории", type: "practical" }
+            ]
+        }
+    ];
+
+    const resultsData = {
+        "it": {
+            title: "IT-специалист / Инженер",
+            desc: "У тебя аналитический склад ума! Тебе отлично подойдут профессии вроде программиста, аналитика данных, AI-инженера или системного архитектора."
+        },
+        "social": {
+            title: "Специалист по работе с людьми",
+            desc: "Твоя сильная сторона — коммуникация. Тебе стоит рассмотреть профессии психолога, HR-менеджера, врача, преподавателя или PR-специалиста."
+        },
+        "creative": {
+            title: "Творческий деятель",
+            desc: "У тебя отлично развито воображение. Обрати внимание на дизайн, архитектуру, режиссуру, копирайтинг или маркетинг."
+        },
+        "practical": {
+            title: "Инженер-практик / Создатель",
+            desc: "Ты любишь видеть реальный результат своего труда. Тебе подойдут направления, связанные с производством, строительством, робототехникой или биотехнологиями."
+        }
+    };
+
+    let currentQuestionIndex = 0;
+    let scores = { social: 0, it: 0, creative: 0, practical: 0 };
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        scores = { social: 0, it: 0, creative: 0, practical: 0 };
+        showPage('quiz');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const qText = document.getElementById('question-text');
+        const optsContainer = document.getElementById('options-container');
+        
+        optsContainer.innerHTML = '';
+        
+        const currentQ = questions[currentQuestionIndex];
+        qText.innerText = currentQ.text;
+        
+        currentQ.options.forEach(option => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerText = option.text;
+            btn.onclick = () => selectOption(option.type);
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(type) {
+        scores[type]++;
+        currentQuestionIndex++;
+        
+        if (currentQuestionIndex < questions.length) {
+            renderQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        let maxType = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+        
+        document.getElementById('result-title').innerText = resultsData[maxType].title;
+        document.getElementById('result-desc').innerText = resultsData[maxType].desc;
+        
+        showPage('result');
+    }
+</script>
+
+</body>
+</html>
